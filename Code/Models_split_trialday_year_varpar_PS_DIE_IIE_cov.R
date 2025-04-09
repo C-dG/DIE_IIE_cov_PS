@@ -8,8 +8,12 @@
 
 #===============================================================================
 
+# Save local package information:
 #install.packages("renv")
 #renv::init()
+
+# Load local package information:
+renv::restore()
 
 library(rstan)
 library(shinystan)
