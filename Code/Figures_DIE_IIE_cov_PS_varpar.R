@@ -46,10 +46,6 @@ df <- read.csv("Data/Data_PS_DIE_IIE_cov.csv", header = TRUE)
 
 Res <- 1000 # Resolution used in the plots that are saved as png.
 
-# Create a folder to save the models
-ifelse(file.exists("Plots"), "Dir already exists",
-       dir.create("Plots"))
-
 # Legend of figures: (All work independently)
 
 # Main figures
@@ -92,8 +88,6 @@ Res_rep <- Biv_PS_mod %>% filter(Variable %in% c("rep_res", "rep_res_2", "res_co
 Covs_1 <- Covs_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), 
                 ~ case_when(Variable == "cov_P1" ~ .* sd(df$Producing_events), TRUE ~ .)))
 Covs_1 <- Covs_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), 
-                     ~ case_when(Variable == "cov_P1" ~ .* sd(df$Producing_events), TRUE ~ .)))
-Covs_1 <- Covs_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), 
                      ~ case_when(Variable %in% c("cov_P2", "cov_P3", "cov_P4", "cov_P5") ~ 
                      .* (sd(df$Producing_events)*sd(df$Scrounging_events)), TRUE ~ .)))
 Covs_1 <- Covs_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), 
@@ -112,37 +106,37 @@ Res_var <- Res_var %>% mutate(across(c("2.5%", "50%", "97.5%"),
                       ~ case_when(Variable == "res_cov" ~ .* (sd(df$Producing_events)*sd(df$Scrounging_events)), TRUE ~ .)))
 
 # Derive the estimate + 95% credible interval 
-Covs_1 <- Covs_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Covs_1 <- Covs_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(format(round(., 3), nsmall = 3), nsmall = 3)))
 Covs_1 <- Covs_1 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Covs_1 <- Covs_1 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Covs_1 <- Covs_1 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
 Covs_1 <- Covs_1 %>% relocate("Estimate")
 
-Cors_1 <- Cors_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Cors_1 <- Cors_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Cors_1 <- Cors_1 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Cors_1 <- Cors_1 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Cors_1 <- Cors_1 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
 Cors_1 <- Cors_1 %>% relocate("Estimate")
 
-Vars_1 <- Vars_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Vars_1 <- Vars_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Vars_1 <- Vars_1 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Vars_1 <- Vars_1 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Vars_1 <- Vars_1 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
 Vars_1 <- Vars_1 %>% relocate("Estimate")
 
-Reps_1 <- Reps_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Reps_1 <- Reps_1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Reps_1 <- Reps_1 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Reps_1 <- Reps_1 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Reps_1 <- Reps_1 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
 Reps_1 <- Reps_1 %>% relocate("Estimate")
 
-Res_var <- Res_var %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Res_var <- Res_var %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Res_var <- Res_var %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Res_var <- Res_var %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Res_var <- Res_var %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
 Res_var <- Res_var %>% relocate("Estimate")
 
-Res_rep <- Res_rep %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Res_rep <- Res_rep %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(format(round(., 3), nsmall = 3), nsmall = 3)))
 Res_rep <- Res_rep %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Res_rep <- Res_rep %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Res_rep <- Res_rep %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -243,12 +237,31 @@ sjPlot::tab_df(Tab4, alternate.rows = T, file = paste("Plots/Table_rescor_bivar_
 md_bivar <- readRDS("Model_output/md_PS_bivar_full.rds")
 df <- read.csv("Data/Data_PS_DIE_IIE_cov.csv", header = TRUE)
 
-posterior_bivar_covs <- as.data.frame(rstan::extract(md_bivar, pars = c("cov_P1", "cov_P2", "cov_P3", "cov_P4", "cov_P5", "cov_P6", "var_DIE", "var_DIE_2")))
+posterior_bivar_covs <- as.data.frame(rstan::extract(md_bivar, pars = c("cov_P1", "cov_P2", "cov_P3", "cov_P4", "cov_P5", "cov_P6",
+                                                                        "var_DIE", "var_DIE_2", "var_IIE", "var_IIE_2")))
 
 posterior_bivar_covs$iteration <- seq_along(1:nrow(posterior_bivar_covs))
 
+round(summary(md_bivar, pars = c("cov_P1", "cov_P2", "cov_P3", "cov_P4", "cov_P5", "cov_P6",
+                                         "var_DIE", "var_DIE_2", "var_IIE", "var_IIE_2"))$summary[,c(1,4,6,8,9,10)],3)
+
+# Backtransforming is only necessary if you want the psi's on the "original" unstandardised scale
+
+# # Backtransform variances
+# posterior_bivar_covs$var_DIE <- posterior_bivar_covs$var_DIE * var(df$Producing_events)
+# posterior_bivar_covs$var_DIE_2 <- posterior_bivar_covs$var_DIE_2 * var(df$Scrounging_events)  
+# posterior_bivar_covs$var_IIE <- posterior_bivar_covs$var_IIE * var(df$Producing_events)
+# posterior_bivar_covs$var_IIE_2 <- posterior_bivar_covs$var_IIE_2 * var(df$Scrounging_events)  
+# 
+# # Backtransform covariances
+# posterior_bivar_covs$cov_P1 <- posterior_bivar_covs$cov_P1 * sd(df$Producing_events)
+# posterior_bivar_covs$cov_P2 <- posterior_bivar_covs$cov_P2 * (sd(df$Producing_events) * sd(df$Scrounging_events))   
+# posterior_bivar_covs$cov_P3 <- posterior_bivar_covs$cov_P3 * (sd(df$Producing_events) * sd(df$Scrounging_events))
+# posterior_bivar_covs$cov_P4 <- posterior_bivar_covs$cov_P4 * (sd(df$Producing_events) * sd(df$Scrounging_events))    
+# posterior_bivar_covs$cov_P5 <- posterior_bivar_covs$cov_P5 * (sd(df$Producing_events) * sd(df$Scrounging_events))
+# posterior_bivar_covs$cov_P6 <- posterior_bivar_covs$cov_P6 * sd(df$Scrounging_events)    
+
 # Derive psi matrix per posterior sample (iteration)
-# Multivariate psi (equation 14 Brodie & McGlothlin 2009)
 DIE_mat <- list()
 
 for(i in 1:nrow(posterior_bivar_covs)){
@@ -269,40 +282,6 @@ for(i in 1:nrow(posterior_bivar_covs)){
                                  nrow = 2, ncol =2, byrow = TRUE)
 } 
 
-psi_mat_posterior <- array(NA, dim = c(nrow(posterior_bivar_covs), 2, 2))
-
-for(i in 1:nrow(posterior_bivar_covs)){
-  psi_mat_posterior[i,,] <-  IIE_DIE_cov_mat[[i]] %*% solve(DIE_mat[[i]]) 
-} 
-
-# Summarize posterior results
-psi_mat <- as.data.frame(apply(psi_mat_posterior, c(2,3), quantile,probs = c(0.025, 0.5, 0.975), na.rm = TRUE))
-psi_mat <- as.data.frame(t(psi_mat))
-psi_mat <- psi_mat %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
-psi_mat <- psi_mat %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
-psi_mat <- psi_mat %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
-psi_mat <- psi_mat %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
-psi_mat <- psi_mat %>% relocate("Estimate")
-
-# Make (capital letter) psi table
-Tab_psi <- as.data.frame(matrix(nrow = 2, ncol = 2))
-row.names(Tab_psi) <- c("Producing", "Scrounging")
-colnames(Tab_psi) <- c("Producing", "Scrounging")
-
-# Psi in table
-Tab_psi[1,1] <- print(psi_mat["1.1","Estimate"])
-Tab_psi[1,2] <- print(psi_mat["1.2","Estimate"])
-Tab_psi[2,1] <- print(psi_mat["2.1","Estimate"])
-Tab_psi[2,2] <- print(psi_mat["2.2","Estimate"])
-
-Tab_psi[is.na(Tab_psi)] <- "-"
-
-Tab_psi$. <- rownames(Tab_psi)
-Tab_psi <- Tab_psi %>% relocate(".")
-
-tab_df(Tab_psi, alternate.rows = T)
-sjPlot::tab_df(Tab_psi, alternate.rows = T, file = paste("Plots/Table_psi_PS.doc"))
-
 
 # Adjusted for group size (equation 26 Brodie & McGlothlin 2009)
 n <- 3
@@ -315,7 +294,7 @@ for(i in 1:nrow(posterior_bivar_covs)){
 # Summarize posterior results
 psi_mat_adj <- as.data.frame(apply(psi_mat_posterior_adj, c(2,3), quantile,probs = c(0.025, 0.5, 0.975), na.rm = TRUE))
 psi_mat_adj <- as.data.frame(t(psi_mat_adj))
-psi_mat_adj <- psi_mat_adj %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+psi_mat_adj <- psi_mat_adj %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 psi_mat_adj <- psi_mat_adj %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 psi_mat_adj <- psi_mat_adj %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 psi_mat_adj <- psi_mat_adj %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -341,8 +320,46 @@ tab_df(Tab_psi_adj, alternate.rows = T)
 sjPlot::tab_df(Tab_psi_adj, alternate.rows = T, file = paste("Plots/Table_psi_adj_PS.doc"))
 
 
+
+# Without accounting for groupsize, not reported in MS
+# Multivariate psi (equation 14 Brodie & McGlothlin 2009)
+
+psi_mat_posterior <- array(NA, dim = c(nrow(posterior_bivar_covs), 2, 2))
+
+for(i in 1:nrow(posterior_bivar_covs)){
+  psi_mat_posterior[i,,] <-  IIE_DIE_cov_mat[[i]] %*% solve(DIE_mat[[i]]) 
+} 
+
+# Summarize posterior results
+psi_mat <- as.data.frame(apply(psi_mat_posterior, c(2,3), quantile,probs = c(0.025, 0.5, 0.975), na.rm = TRUE))
+psi_mat <- as.data.frame(t(psi_mat))
+psi_mat <- psi_mat %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
+psi_mat <- psi_mat %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
+psi_mat <- psi_mat %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
+psi_mat <- psi_mat %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
+psi_mat <- psi_mat %>% relocate("Estimate")
+
+# Make (capital letter) psi table
+Tab_psi <- as.data.frame(matrix(nrow = 2, ncol = 2))
+row.names(Tab_psi) <- c("Producing", "Scrounging")
+colnames(Tab_psi) <- c("Producing", "Scrounging")
+
+# Psi in table
+Tab_psi[1,1] <- print(psi_mat["1.1","Estimate"])
+Tab_psi[1,2] <- print(psi_mat["1.2","Estimate"])
+Tab_psi[2,1] <- print(psi_mat["2.1","Estimate"])
+Tab_psi[2,2] <- print(psi_mat["2.2","Estimate"])
+
+Tab_psi[is.na(Tab_psi)] <- "-"
+
+Tab_psi$. <- rownames(Tab_psi)
+Tab_psi <- Tab_psi %>% relocate(".")
+
+tab_df(Tab_psi, alternate.rows = T)
+sjPlot::tab_df(Tab_psi, alternate.rows = T, file = paste("Plots/Table_psi_PS.doc"))
+
 #===============================================================================
-# Fig 2C: Total phenotpyic efect table 
+# Fig 2D: Total phenotpyic efect table 
 
 # Read in BLUPS from model & wrangle
 Bivar_full_P_eff <- as.data.frame(readRDS("Model_output/Sum_md_PS_bivar_full.rds"))
@@ -359,7 +376,7 @@ Bivar_full_P_eff <- Bivar_full_P_eff %>%
                 ~ ifelse(grepl("total_P_eff", Variable) & Behaviour == "Scrounging", . * var(df$Scrounging_events), 
                          ifelse(grepl("total_P_eff", Variable) & Behaviour == "Producing", . * var(df$Producing_events), .))))
 
-Bivar_full_P_eff <- Bivar_full_P_eff %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Bivar_full_P_eff <- Bivar_full_P_eff %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Bivar_full_P_eff <- Bivar_full_P_eff %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Bivar_full_P_eff <- Bivar_full_P_eff %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Bivar_full_P_eff <- Bivar_full_P_eff %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -523,6 +540,7 @@ BLUPS <- BLUPS %>% pivot_wider(names_from = Variable, values_from = c("CI1", "Me
 
 Corrs$Variable <- row.names(Corrs)
 Corrs <- Corrs %>% filter(stringr::str_detect(Variable,"cor"))
+Corrs <- Corrs %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Corrs <- Corrs %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Corrs <- Corrs %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Corrs <- Corrs %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -762,7 +780,7 @@ Bivar_unadjusted <- Bivar_unadjusted %>% mutate(across(c("2.5%", "50%", "97.5%")
                                            ~ ifelse(grepl("order", Variable), . / sd(df$TrialNR_Indiv), .)))
 
 # Wrangle further
-Bivar_full <- Bivar_full %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Bivar_full <- Bivar_full %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Bivar_full <- Bivar_full %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Bivar_full <- Bivar_full %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Bivar_full <- Bivar_full %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -778,7 +796,7 @@ Bivar_full$Variables1 <- c("Intercept", "Year", "Trial order", "Trial day", "Gro
 Prd_bivar <- Bivar_full %>% filter(Behaviour == "Producing") %>% dplyr::select("Variables1", "Estimate")
 Scr_bivar <- Bivar_full %>% filter(Behaviour == "Scrounging") %>% dplyr::select("Variables1", "Estimate")
 
-Bivar_unadjusted <- Bivar_unadjusted %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Bivar_unadjusted <- Bivar_unadjusted %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Bivar_unadjusted <- Bivar_unadjusted %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Bivar_unadjusted <- Bivar_unadjusted %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Bivar_unadjusted <- Bivar_unadjusted %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -873,7 +891,7 @@ cy_rep_scr <- cy_rep_scr %>% mutate(across(c("2.5%", "50%", "97.5%"),
                                            ~ ifelse(grepl("order", Variable), . / sd(df$TrialNR_Indiv), .)))
 
 # Wrangle data
-cy_rep_prd <- cy_rep_prd %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+cy_rep_prd <- cy_rep_prd %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var8 <- cy_rep_prd %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var8 <- Var8 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var8 <- Var8 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -885,7 +903,7 @@ Var8$Variables1 <- c("Intercept", "Year", "Trial order", "Trial day", "Group tri
                      "Cross-year rep DIE", "Short-term rep DIE", "Cross-year rep IIE","Short-term rep IIE","lp__")
 cy_rep_prd2 <- Var8 %>% select("Variables1", "Estimate")
 
-cy_rep_scr <- cy_rep_scr %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+cy_rep_scr <- cy_rep_scr %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var9 <- cy_rep_scr %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var9 <- Var9 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var9 <- Var9 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1210,7 +1228,7 @@ Sum_md_prd_full <- Sum_md_prd_full %>% mutate(across(c("2.5%", "50%", "97.5%"),
 
 # Wrangle data for table
 Var1 <- as.data.frame(Sum_md_scr_22)
-Var1 <- Var1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var1 <- Var1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var1 <- Var1 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var1 <- Var1 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var1 <- Var1 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1219,7 +1237,7 @@ Var1$Variables1 <- c("Intercept scrounging", "BMR", "Trial day", "Trial order", 
 scr_mod1 <- Var1 %>% select("Variables1", "Estimate")
 
 Var2 <- as.data.frame(Sum_md_scr_22_td1)
-Var2 <- Var2 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var2 <- Var2 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var2 <- Var2 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var2 <- Var2 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var2 <- Var2 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1228,7 +1246,7 @@ Var2$Variables1 <- c("Intercept scrounging", "BMR", "Trial order", "Var DIE", "V
 scr_mod2 <- Var2 %>% select("Variables1", "Estimate")
 
 Var3 <- as.data.frame(Sum_md_scr_22_td2)
-Var3 <- Var3 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var3 <- Var3 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var3 <- Var3 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var3 <- Var3 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var3 <- Var3 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1237,7 +1255,7 @@ Var3$Variables1 <- c("Intercept scrounging", "BMR", "Trial order", "Var DIE", "V
 scr_mod3 <- Var3 %>% select("Variables1", "Estimate")
 
 Var4 <- as.data.frame(Sum_md_scr_23)
-Var4 <- Var4 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var4 <- Var4 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var4 <- Var4 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var4 <- Var4 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var4 <- Var4 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1246,7 +1264,7 @@ Var4$Variables1 <- c("Intercept scrounging", "Trial order", "Trial day", "Group 
 scr_mod4 <- Var4 %>% select("Variables1", "Estimate")
 
 Var5 <- as.data.frame(Sum_md_scr_23_td1)
-Var5 <- Var5 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var5 <- Var5 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var5 <- Var5 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var5 <- Var5 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var5 <- Var5 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1255,7 +1273,7 @@ Var5$Variables1 <- c("Intercept scrounging", "Trial order", "Group trial before"
 scr_mod5 <- Var5 %>% select("Variables1", "Estimate")
 
 Var6 <- as.data.frame(Sum_md_scr_23_td2)
-Var6 <- Var6 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var6 <- Var6 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var6 <- Var6 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var6 <- Var6 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var6 <- Var6 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1264,7 +1282,7 @@ Var6$Variables1 <- c("Intercept scrounging", "Trial order", "Group trial before"
 scr_mod6 <- Var6 %>% select("Variables1", "Estimate")
 
 Var7 <- as.data.frame(Sum_md_scr_full)
-Var7 <- Var7 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var7 <- Var7 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var7 <- Var7 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var7 <- Var7 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var7 <- Var7 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1342,7 +1360,7 @@ sjPlot::tab_df(Scr_table, alternate.rows = T, file = paste("Plots/Table_scr_spli
 # For producing
 # Wrangle data for table
 Var1 <- as.data.frame(Sum_md_prd_22)
-Var1 <- Var1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var1 <- Var1 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var1 <- Var1 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var1 <- Var1 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var1 <- Var1 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1351,7 +1369,7 @@ Var1$Variables1 <- c("Intercept producing", "BMR", "Trial day", "Trial order", "
 prd_mod1 <- Var1 %>% select("Variables1", "Estimate")
 
 Var2 <- as.data.frame(Sum_md_prd_22_td1)
-Var2 <- Var2 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var2 <- Var2 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var2 <- Var2 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var2 <- Var2 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var2 <- Var2 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1360,7 +1378,7 @@ Var2$Variables1 <- c("Intercept producing", "BMR", "Trial order", "Var DIE", "Va
 prd_mod2 <- Var2 %>% select("Variables1", "Estimate")
 
 Var3 <- as.data.frame(Sum_md_prd_22_td2)
-Var3 <- Var3 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var3 <- Var3 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var3 <- Var3 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var3 <- Var3 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var3 <- Var3 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1369,7 +1387,7 @@ Var3$Variables1 <- c("Intercept producing", "BMR", "Trial order", "Var DIE", "Va
 prd_mod3 <- Var3 %>% select("Variables1", "Estimate")
 
 Var4 <- as.data.frame(Sum_md_prd_23)
-Var4 <- Var4 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var4 <- Var4 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var4 <- Var4 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var4 <- Var4 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var4 <- Var4 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1378,7 +1396,7 @@ Var4$Variables1 <- c("Intercept producing", "Trial order", "Trial day", "Group t
 prd_mod4 <- Var4 %>% select("Variables1", "Estimate")
 
 Var5 <- as.data.frame(Sum_md_prd_23_td1)
-Var5 <- Var5 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var5 <- Var5 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var5 <- Var5 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var5 <- Var5 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var5 <- Var5 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1387,7 +1405,7 @@ Var5$Variables1 <- c("Intercept producing", "Trial order", "Group trial before",
 prd_mod5 <- Var5 %>% select("Variables1", "Estimate")
 
 Var6 <- as.data.frame(Sum_md_prd_23_td2)
-Var6 <- Var6 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var6 <- Var6 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var6 <- Var6 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var6 <- Var6 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var6 <- Var6 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
@@ -1396,7 +1414,7 @@ Var6$Variables1 <- c("Intercept producing", "Trial order", "Group trial before",
 prd_mod6 <- Var6 %>% select("Variables1", "Estimate")
 
 Var7 <- as.data.frame(Sum_md_prd_full)
-Var7 <- Var7 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ round(., 3)))
+Var7 <- Var7 %>% mutate(across(c("2.5%", "50%", "97.5%"), ~ format(round(., 3), nsmall = 3)))
 Var7 <- Var7 %>% unite(`2.5%`, `97.5%`, col = "Credible interval", sep = " ; ", remove = F)
 Var7 <- Var7 %>% mutate(`Credible interval`= paste0("(",`Credible interval`, ")"))
 Var7 <- Var7 %>% unite(`50%`, `Credible interval`, col = "Estimate", sep = " ", remove = F)
